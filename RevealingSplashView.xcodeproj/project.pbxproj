@@ -234,6 +234,7 @@
 				834E42371C7FFC71007F856E /* Frameworks */,
 				834E42381C7FFC71007F856E /* Headers */,
 				834E42391C7FFC71007F856E /* Resources */,
+				1F7656401DB7C1F6008B1D07 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -386,6 +387,19 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		1F7656401DB7C1F6008B1D07 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 8;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+			shellPath = /bin/sh;
+			shellScript = "post_install do |installer|\ninstaller.pods_project.targets.each do |target|\ntarget.build_configurations.each do |config|\nconfig.build_settings['SWIFT_VERSION'] = '2.3'\nend\nend\nend";
+		};
 		2D4F101590CCC041E00F0FA8 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
