@@ -33,6 +33,9 @@ public extension SplashAnimatable where Self: UIView {
         case .swingAndZoomOut:
             playSwingAnimation(completion)
             
+        case .shakeAndZoomOut:
+            playShakeAnimation(completion)
+            
         case .popAndZoomOut:
             playPopAnimation(completion)
             
@@ -107,10 +110,10 @@ public extension SplashAnimatable where Self: UIView {
         if let imageView = self.imageView{
             
             /**
-            Sets the animation with duration delay and completion
-            
-            - returns:
-            */
+             Sets the animation with duration delay and completion
+             
+             - returns:
+             */
             UIView.animate(withDuration: duration, delay: delay, usingSpringWithDamping: 0.5, initialSpringVelocity: 3, options: UIViewAnimationOptions(), animations: {
                 
                 //Sets a simple rotate
@@ -161,7 +164,7 @@ public extension SplashAnimatable where Self: UIView {
                 imageView.layer.add(animationGroup, forKey: "wobble")
                 }, completion: {
                     
-                     self.playZoomOutAnimation(completion)
+                    self.playZoomOutAnimation(completion)
             })
             
         }
@@ -195,6 +198,74 @@ public extension SplashAnimatable where Self: UIView {
         }
     }
     
+    /**
+     Plays the shake animation and zoom out
+     
+     - parameter completion: completion
+     */
+    public func playShakeAnimation(_ completion: SplashAnimatableCompletion? = nil)
+    {
+        let stepsCount = 10000.0
+        
+        if let imageView = self.imageView {
+            animateLayer({
+                UIView.animate(withDuration: CFTimeInterval(self.duration), animations: {
+                    imageView.transform = CGAffineTransform(scaleX: 1.5, y: 1.5)
+                    }, completion: nil)
+                
+                let animation = CAKeyframeAnimation(keyPath: "position")
+                
+                var animationValues = [Any]()
+                var position = 0.0
+                
+                while position < stepsCount {
+                    animationValues.append(NSValue(cgPoint: CGPoint(x: imageView.center.x - CGFloat(0.0007 * position), y: imageView.center.y)))
+                    animationValues.append(NSValue(cgPoint: CGPoint(x: imageView.center.x + CGFloat(0.0007 * position), y: imageView.center.y)))
+                    
+                    position += 1.0
+                }
+                
+                animation.values = animationValues
+                animation.duration = self.duration
+                animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseIn)
+                animation.isRemovedOnCompletion = true
+                
+                imageView.layer.add(animation, forKey: "shake")
+                
+                }, completion: {
+                    self.animateLayer({
+                        self.playReversedShakeAnimation(with: imageView)
+                        }, completion: {
+                            self.playZoomOutAnimation(completion)
+                    })
+            })
+        }
+    }
+    
+    private func playReversedShakeAnimation(with imageView: UIImageView) {
+        UIView.animate(withDuration: CFTimeInterval(self.duration), animations: {
+            imageView.transform = CGAffineTransform(scaleX: 1, y: 1)
+            }, completion: nil)
+        
+        let animation = CAKeyframeAnimation(keyPath: "position")
+        
+        var animationValues = [Any]()
+        var position = 10000.0
+        
+        while position > 0.0 {
+            animationValues.append(NSValue(cgPoint: CGPoint(x: imageView.center.x - CGFloat(0.0007 * position), y: imageView.center.y)))
+            animationValues.append(NSValue(cgPoint: CGPoint(x: imageView.center.x + CGFloat(0.0007 * position), y: imageView.center.y)))
+            
+            position -= 1
+        }
+        
+        animation.values = animationValues
+        animation.duration = self.duration
+        animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseIn)
+        animation.isRemovedOnCompletion = true
+        
+        imageView.layer.add(animation, forKey: "shake_reversed")
+    }
     
     /**
      Plays the pop animation with completion
@@ -218,7 +289,7 @@ public extension SplashAnimatable where Self: UIView {
                 animation.beginTime = CACurrentMediaTime() + CFTimeInterval(self.delay/2)
                 imageView.layer.add(animation, forKey: "pop")
                 }, completion: {
-                     self.playZoomOutAnimation(completion)
+                    self.playZoomOutAnimation(completion)
             })
         }
     }
@@ -296,13 +367,13 @@ public extension SplashAnimatable where Self: UIView {
                 animation.repeatCount = Float(minimumBeats > 0 ? minimumBeats : 1)
                 animation.beginTime = CACurrentMediaTime() + CFTimeInterval(self.delay/2)
                 imageView.layer.add(animation, forKey: "pop")
-                }, completion: { [weak self] in 
+                }, completion: { [weak self] in
                     if self?.heartAttack ?? true {
                         self?.playZoomOutAnimation(completion)
                     } else {
                         self?.playHeartBeatAnimation(completion)
                     }
-            })
+                })
         }
     }
     
@@ -316,6 +387,6 @@ public extension SplashAnimatable where Self: UIView {
     {
         self.heartAttack = true
     }
-
+    
     
 }

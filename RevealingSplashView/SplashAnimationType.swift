@@ -19,6 +19,7 @@ public enum SplashAnimationType: String{
     case rotateOut
     case woobleAndZoomOut
     case swingAndZoomOut
+    case shakeAndZoomOut
     case popAndZoomOut
     case squeezeAndZoomOut
     case heartBeat
